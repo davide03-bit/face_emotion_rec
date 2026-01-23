@@ -3,8 +3,10 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import confusion_matrix, accuracy_score
 from preprocessing import data_split
+from SVD import SVD, explained_variance_ratio
+from PCA import PCA
 
-path = "/home/davide/Scaricati/ckextended.csv"
+path = "ckextended.csv"
 
 df = pd.read_csv(path)
 df = df.sample(frac=1).reset_index(drop=True)
@@ -38,4 +40,9 @@ print(df.head())
 
 X_train, y_train, X_validation, y_validation, X_test, y_test = data_split(df)
 
-print(X_train)
+exp_var_optimal= 0.95
+V_truncated= explained_variance_ratio(X_train, exp_var_optimal)
+
+Z= PCA(X_train, V_truncated)
+print(Z)
+

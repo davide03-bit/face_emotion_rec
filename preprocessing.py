@@ -7,28 +7,23 @@ def pixels_to_matrix(dataframe):
     return X
 
 def data_split(dataframe):
-    data_training= dataframe[(dataframe['Usage'] == 'Training') | (dataframe['Usage'] == 'PrivateTest')]
+    mask_train = dataframe['Usage'] == 'Training'
+    mask_val = dataframe['Usage'] == 'PrivateTest'
+    mask_test = dataframe['Usage'] == 'PublicTest'
 
-    X_training = pixels_to_matrix(data_training)
-    y_training = data_training['emotion'].values
+    X_train_raw = pixels_to_matrix(dataframe[mask_train])
+    X_val_raw = pixels_to_matrix(dataframe[mask_val])
+    X_test_raw = pixels_to_matrix(dataframe[mask_test])
 
-    dataframe_test = dataframe[dataframe['Usage'] == 'PublicTest']
-    X_test = pixels_to_matrix(dataframe_test)
-    y_test = dataframe_test['emotion'].values
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train_raw)
 
-    std = StandardScaler()
-    X_training= std.fit_transform(X_training)
-    X_test= std.transform(X_test)
-    
-    is_train = (data_training['Usage'] == 'Training').values
-    is_val = (data_training['Usage'] == 'PrivateTest').values
+    X_val = scaler.transform(X_val_raw)
+    X_test = scaler.transform(X_test_raw)
 
-    X_train = X_training[is_train]
-    y_train = y_training[is_train]
-    
-    X_validation = X_training[is_val]
-    y_validation = y_training[is_val]
+    y_train = dataframe[mask_train]['emotion'].values
+    y_val = dataframe[mask_train]['emotion'].values
+    y_test = dataframe[mask_train]['emotion'].values
 
-
-    return X_train, y_train, X_validation, y_validation, X_test, y_test
+    return X_train, y_train, X_val, y_val, X_test, y_test
 
