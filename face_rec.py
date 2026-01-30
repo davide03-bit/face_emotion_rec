@@ -1,10 +1,9 @@
 import pandas as pd
-import numpy as np
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import confusion_matrix, accuracy_score
+from sklearn.metrics import confusion_matrix, accuracy_score, classification_report
 from preprocessing import data_split
 from SVD import SVD, explained_variance_ratio
-from PCA import PCA
+from PCA import PCA, Classification
+from plot import plot_eigenfaces, plot_confusion_matrix_heatmap
 
 path = "ckextended.csv"
 
@@ -38,11 +37,13 @@ for num, val in emotions.items():
 
 print(df.head())
 
-X_train, y_train, X_validation, y_validation, X_test, y_test = data_split(df)
+X_train, y_train, X_test, y_test = data_split(df)
 
 exp_var_optimal= 0.95
 V_truncated= explained_variance_ratio(X_train, exp_var_optimal)
 
-Z= PCA(X_train, V_truncated)
-print(Z)
+y_pred= Classification(X_train, X_test, y_train, V_truncated)
+print(classification_report(y_test, y_pred))
 
+plot_eigenfaces(V_truncated, image_shape=(48, 48))
+plot_confusion_matrix_heatmap(y_test, y_pred, emotions)

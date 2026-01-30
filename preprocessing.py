@@ -7,23 +7,18 @@ def pixels_to_matrix(dataframe):
     return X
 
 def data_split(dataframe):
-    mask_train = dataframe['Usage'] == 'Training'
-    mask_val = dataframe['Usage'] == 'PrivateTest'
+    mask_train = (dataframe['Usage'] == 'Training') | (dataframe['Usage'] == 'PrivateTest')
     mask_test = dataframe['Usage'] == 'PublicTest'
 
     X_train_raw = pixels_to_matrix(dataframe[mask_train])
-    X_val_raw = pixels_to_matrix(dataframe[mask_val])
     X_test_raw = pixels_to_matrix(dataframe[mask_test])
 
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train_raw)
-
-    X_val = scaler.transform(X_val_raw)
     X_test = scaler.transform(X_test_raw)
 
     y_train = dataframe[mask_train]['emotion'].values
-    y_val = dataframe[mask_train]['emotion'].values
-    y_test = dataframe[mask_train]['emotion'].values
+    y_test = dataframe[mask_test]['emotion'].values
 
-    return X_train, y_train, X_val, y_val, X_test, y_test
+    return X_train, y_train, X_test, y_test
 
